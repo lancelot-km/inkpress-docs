@@ -1,4 +1,4 @@
-"""Minimal Flask server for docs.inkpress.zorohq.com.
+"""Minimal Flask server for inkpress-docs.zorohq.com.
 
 Serves:
   GET /              → redirect to /readme.txt
