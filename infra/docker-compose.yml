@@ -1,0 +1,9 @@
+name: inkpress-docs
+
+services:
+  docs:
+    image: ${DOCS_IMAGE:-registry.zorohq.com/inkpress-docs:latest}
+    container_name: inkpress-docs
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:18505:8505"

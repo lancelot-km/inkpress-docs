@@ -1,0 +1,37 @@
+labels:
+  inkpress: true
+
+when:
+  - event: push
+    branch: [main, develop]
+  - event: manual
+
+steps:
+  build-and-push:
+    image: docker:27-cli
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      REGISTRY_PASSWORD:
+        from_secret: registry_password
+    commands:
+      - SHA=${CI_COMMIT_SHA:0:7}
+      - TAG="${CI_COMMIT_BRANCH}-$SHA"
+      - docker build -t 127.0.0.1:5000/inkpress-docs:latest -t 127.0.0.1:5000/inkpress-docs:$SHA -t 127.0.0.1:5000/inkpress-docs:$TAG .
+      - docker push 127.0.0.1:5000/inkpress-docs:latest
+      - docker push 127.0.0.1:5000/inkpress-docs:$SHA
+      - docker push 127.0.0.1:5000/inkpress-docs:$TAG
+
+  deploy-stage:
+    image: docker:27-cli
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/inkpress-docs:/opt/inkpress-docs
+    commands:
+      - mkdir -p /opt/inkpress-docs/infra
+      - cp infra/docker-compose.yml /opt/inkpress-docs/infra/docker-compose.yml
+      - cd /opt/inkpress-docs
+      - echo "DOCS_IMAGE=registry.zorohq.com/inkpress-docs:latest" > .env
+      - docker pull 127.0.0.1:5000/inkpress-docs:latest
+      - docker tag 127.0.0.1:5000/inkpress-docs:latest registry.zorohq.com/inkpress-docs:latest
+      - docker compose --env-file .env -f infra/docker-compose.yml up -d
