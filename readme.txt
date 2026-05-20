@@ -42,7 +42,9 @@
   • A domain you control with DNS pointing at your VPS IP.
 
   • Your InkPress license key (format: IPRS-XXXX-XXXX-XXXX-LIFE).
-      Bought at https://inkpress-app.zorohq.com/pricing.
+      Get yours at https://inkpress-app.zorohq.com/pricing.
+      Pay-what-you-want — set $0 if you can't afford it and the same key
+      lands in your account. One free per person; pay anything for extras.
 
   • An admin email + password — these are the writer's login credentials
     for the studio. You set them at install time; can be changed later.
