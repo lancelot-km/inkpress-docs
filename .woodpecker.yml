@@ -31,7 +31,8 @@ steps:
       - mkdir -p /opt/inkpress-docs/infra
       - cp infra/docker-compose.yml /opt/inkpress-docs/infra/docker-compose.yml
       - cd /opt/inkpress-docs
-      - echo "DOCS_IMAGE=registry.zorohq.com/inkpress-docs:latest" > .env
+      # Compose pulls + runs from 127.0.0.1:5000 directly — no retag, sidesteps the
+      # containerd image store "AlreadyExists" error when retagging same digest.
+      - echo "DOCS_IMAGE=127.0.0.1:5000/inkpress-docs:latest" > .env
       - docker pull 127.0.0.1:5000/inkpress-docs:latest
-      - docker tag 127.0.0.1:5000/inkpress-docs:latest registry.zorohq.com/inkpress-docs:latest
       - docker compose --env-file .env -f infra/docker-compose.yml up -d
