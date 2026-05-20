@@ -5,7 +5,7 @@
   An encrypted, self-hosted publishing studio sold as a license.
   You buy a license, install on your own VPS, and publish from your own domain.
 
-  Latest version of this document:    https://docs.inkpress.zorohq.com/readme.txt
+  Latest version of this document:    https://inkpress-docs.zorohq.com/readme.txt
   Marketing site:                     https://inkpress.zorohq.com
   Buy a license:                      https://inkpress-app.zorohq.com/pricing
   Source mirror (lifetime tier):      https://github.com/lancelot-km
@@ -42,7 +42,9 @@
   • A domain you control with DNS pointing at your VPS IP.
 
   • Your InkPress license key (format: IPRS-XXXX-XXXX-XXXX-LIFE).
-      Bought at https://inkpress-app.zorohq.com/pricing.
+      Get yours at https://inkpress-app.zorohq.com/pricing.
+      Pay-what-you-want — set $0 if you can't afford it and the same key
+      lands in your account. One free per person; pay anything for extras.
 
   • An admin email + password — these are the writer's login credentials
     for the studio. You set them at install time; can be changed later.
@@ -281,8 +283,11 @@
   11. CONTACT
 ═══════════════════════════════════════════════════════════════════════════════
 
-  Issues, bugs, feature requests:  https://github.com/lancelot-km/inkpress-install/issues
-  License questions:               admin@zorohq.com
-  Source mirror (lifetime tier):   https://github.com/lancelot-km/
+  License issues / billing:         license.inkpress@zorohq.com
+  Customer support:                 support.inkpress@zorohq.com
+  Suggestions / dev feedback:       dev.inkpress@zorohq.com
+
+  Bug reports + feature requests:   https://github.com/lancelot-km/inkpress-install/issues
+  Source mirror (lifetime tier):    https://github.com/lancelot-km/
 
 ═══════════════════════════════════════════════════════════════════════════════
