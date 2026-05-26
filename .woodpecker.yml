@@ -33,7 +33,7 @@ steps:
       - cd /opt/inkpress-docs
       # Compose pulls + runs from 127.0.0.1:5000 directly — no retag, sidesteps the
       # containerd image store "AlreadyExists" error when retagging same digest.
-      - echo "DOCS_IMAGE=127.0.0.1:5000/inkpress-docs:latest" > .env
+      - grep -q "^DOCS_IMAGE=" .env 2>/dev/null && sed -i "s|^DOCS_IMAGE=.*|DOCS_IMAGE=127.0.0.1:5000/inkpress-docs:latest|" .env || echo "DOCS_IMAGE=127.0.0.1:5000/inkpress-docs:latest" >> .env
       - docker pull 127.0.0.1:5000/inkpress-docs:latest
       - docker compose --env-file .env -f infra/docker-compose.yml up -d
 
