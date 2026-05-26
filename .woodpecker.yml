@@ -36,3 +36,46 @@ steps:
       - echo "DOCS_IMAGE=127.0.0.1:5000/inkpress-docs:latest" > .env
       - docker pull 127.0.0.1:5000/inkpress-docs:latest
       - docker compose --env-file .env -f infra/docker-compose.yml up -d
+
+  register-proxy:
+    image: alpine:3.20
+    environment:
+      NPM_EMAIL:
+        from_secret: npm_email
+      NPM_PASSWORD:
+        from_secret: npm_password
+      DOMAIN_STAGE: inkpress-docs-stage.zorohq.com
+      DOMAIN_PROD: inkpress-docs-prod.zorohq.com
+      UPSTREAM_HOST: "10.0.1.1"
+      UPSTREAM_PORT: "18505"
+    commands:
+      - apk add --no-cache curl jq
+      - |
+        set -e
+        if [ "$CI_COMMIT_BRANCH" = "main" ]; then
+          DOMAIN="$DOMAIN_PROD"
+        else
+          DOMAIN="$DOMAIN_STAGE"
+        fi
+        TOKEN=$(curl -fsS -X POST http://10.0.1.1:81/api/tokens \
+          -H "Content-Type: application/json" \
+          -d "{\"identity\":\"$NPM_EMAIL\",\"secret\":\"$NPM_PASSWORD\"}" | jq -r .token)
+        [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ] && { echo "NPM auth failed"; exit 1; }
+        EXISTING=$(curl -fsS -H "Authorization: Bearer $TOKEN" \
+          http://10.0.1.1:81/api/nginx/proxy-hosts \
+          | jq -r ".[] | select(.domain_names[] == \"$DOMAIN\") | .id" | head -1)
+        PAYLOAD=$(jq -nc \
+          --arg d "$DOMAIN" --arg h "$UPSTREAM_HOST" --argjson p "$UPSTREAM_PORT" \
+          '{domain_names:[$d],forward_scheme:"http",forward_host:$h,forward_port:$p,
+            block_exploits:true,allow_websocket_upgrade:true,access_list_id:0,
+            certificate_id:0,meta:{},advanced_config:"",locations:[]}')
+        if [ -n "$EXISTING" ]; then
+          echo "Updating proxy host $EXISTING for $DOMAIN"
+          curl -fsS -X PUT -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+            -d "$PAYLOAD" "http://10.0.1.1:81/api/nginx/proxy-hosts/$EXISTING" > /dev/null
+        else
+          echo "Creating proxy host for $DOMAIN"
+          curl -fsS -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+            -d "$PAYLOAD" http://10.0.1.1:81/api/nginx/proxy-hosts > /dev/null
+        fi
+        echo "OK: $DOMAIN -> $UPSTREAM_HOST:$UPSTREAM_PORT"
